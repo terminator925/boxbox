@@ -1,0 +1,20 @@
+.git
+.pytest_cache
+.npm-cache
+venv
+backend/.venv
+frontend/node_modules
+frontend/dist
+outputs
+uploads
+artifacts
+REAL SONGS
+benchmarks
+backend_debug.log
+backend_run.err.log
+backend_run.out.log
+frontend_err.log
+frontend_out.log
+frontend_run.err.log
+frontend_run.out.log
+launch_test.log

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+venv/
+backend/.venv/
+backend/.venv_broken_move_backup/
+
+# Frontend build/cache
+frontend/node_modules/
+frontend/dist/
+.npm-cache/
+
+# Local runtime artifacts
+outputs/
+uploads/
+artifacts/
+backend_debug.log
+backend_run.err.log
+backend_run.out.log
+frontend_err.log
+frontend_out.log
+frontend_run.err.log
+frontend_run.out.log
+launch_test.log
+
+# Local/private audio and benchmark corpora
+REAL SONGS/
+benchmarks/
+data/
+
+# OS/editor
+.DS_Store
+Thumbs.db

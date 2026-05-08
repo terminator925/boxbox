@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: boxbox
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: BOXBOX_INFER_ACCELERATOR
+        value: torch
+      - key: BOXBOX_INFER_CANDIDATE_STRATEGY
+        value: core4_adaptive_plus
+      - key: BOXBOX_HYBRID_SEARCH_STRATEGY
+        value: core4

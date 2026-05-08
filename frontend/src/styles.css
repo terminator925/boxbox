@@ -1,0 +1,565 @@
+:root {
+  --bg: #f6f8f7;
+  --panel: #ffffff;
+  --ink: #1d2b2a;
+  --muted: #5d6a68;
+  --brand: #0f766e;
+  --brand-dark: #114240;
+  --line: #dde6e4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 10% 10%, #d8ece8, transparent 40%),
+    radial-gradient(circle at 90% 0%, #f5dcc2, transparent 35%),
+    var(--bg);
+}
+
+.app-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.brand-kicker {
+  margin-bottom: 8px;
+  color: var(--brand-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.build-stamp {
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border: 1px solid rgba(17, 66, 64, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.lower {
+  align-items: start;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff, #fbfdfc);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(17, 66, 64, 0.06);
+}
+
+.runtime-panel {
+  margin-top: 16px;
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 36%),
+    linear-gradient(180deg, #ffffff, #f7fbfa);
+}
+
+.runtime-panel h3 {
+  margin-bottom: 4px;
+}
+
+.runtime-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+.form-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+input,
+select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.95rem;
+}
+
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: var(--brand);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn.secondary {
+  background: #e7f3f1;
+  color: #124240;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.meta-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.runtime-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.runtime-strip div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.runtime-strip span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.runtime-strip strong {
+  display: block;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+  font-size: 0.84rem;
+  color: var(--brand-dark);
+}
+
+.runtime-note {
+  margin-top: 10px;
+}
+
+.runtime-note.warn {
+  color: #9a5a11;
+}
+
+.lock-card {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.14), transparent 40%),
+    linear-gradient(180deg, #ffffff, #f7fbfa);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.lock-card.good {
+  border-color: rgba(15, 118, 110, 0.34);
+}
+
+.lock-card.warn {
+  border-color: rgba(193, 116, 30, 0.35);
+  background:
+    radial-gradient(circle at top right, rgba(245, 171, 53, 0.18), transparent 42%),
+    linear-gradient(180deg, #ffffff, #fffaf1);
+}
+
+.lock-card.bad {
+  border-color: rgba(172, 51, 51, 0.34);
+  background:
+    radial-gradient(circle at top right, rgba(220, 74, 74, 0.14), transparent 42%),
+    linear-gradient(180deg, #ffffff, #fff7f7);
+}
+
+.lock-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.lock-card-head strong {
+  display: block;
+  font-size: 1.28rem;
+  letter-spacing: -0.02em;
+}
+
+.lock-card-head > span {
+  display: inline-flex;
+  min-width: 64px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--brand-dark);
+  font-weight: 800;
+}
+
+.lock-kicker {
+  color: var(--brand-dark);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lock-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lock-grid div {
+  padding: 10px;
+  border: 1px solid rgba(221, 230, 228, 0.78);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.lock-grid span,
+.lock-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.lock-grid strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.98rem;
+}
+
+.lock-note {
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(60, 167, 158, 0.16), transparent 32%),
+    linear-gradient(135deg, rgba(15, 118, 110, 0.05), transparent 42%);
+  pointer-events: none;
+}
+
+.progress-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--brand-dark);
+  font-size: 0.83rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.progress-pill.busy {
+  animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #eaf2f1, #dfe9e7);
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: inset 0 1px 2px rgba(17, 66, 64, 0.08);
+}
+
+.progress-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 36%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 64%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.progress-bar.busy::after {
+  opacity: 1;
+  animation: progress-track-scan 1.9s linear infinite;
+}
+
+.progress-fill {
+  position: relative;
+  height: 100%;
+  background:
+    linear-gradient(90deg, #0f766e, #1f8d84 46%, #56b8b0 100%);
+  border-radius: inherit;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    0 0 0 1px rgba(15, 118, 110, 0.08),
+    0 0 18px rgba(31, 141, 132, 0.24);
+}
+
+.progress-glow,
+.progress-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.progress-glow {
+  background: radial-gradient(circle at 85% 50%, rgba(255, 255, 255, 0.42), transparent 34%);
+  mix-blend-mode: screen;
+}
+
+.progress-sheen {
+  width: 36%;
+  left: -36%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.08) 70%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+}
+
+.progress-bar.busy .progress-sheen {
+  animation: progress-sheen 1.35s linear infinite;
+}
+
+.progress-bar.complete .progress-fill {
+  box-shadow:
+    0 0 0 1px rgba(15, 118, 110, 0.08),
+    0 0 22px rgba(31, 141, 132, 0.3);
+}
+
+.step-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  background: #edf3f2;
+  color: #5c6866;
+  border: 1px solid transparent;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #b7c5c2;
+  box-shadow: inset 0 0 0 1px rgba(17, 66, 64, 0.08);
+}
+
+.step.active {
+  background: #d9efeb;
+  color: #154745;
+  border-color: rgba(21, 71, 69, 0.08);
+}
+
+.step.active .step-dot {
+  background: #208c84;
+}
+
+.step.current {
+  background: linear-gradient(180deg, #0f766e, #176c67);
+  color: #f4fffd;
+  border-color: rgba(15, 118, 110, 0.14);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.step.current .step-dot {
+  background: #f3fffd;
+  box-shadow: 0 0 0 5px rgba(243, 255, 253, 0.14);
+  animation: step-beacon 1.2s ease-in-out infinite;
+}
+
+.progress-message {
+  margin: 12px 0 0;
+  color: var(--brand-dark);
+}
+
+.progress-message.busy {
+  animation: progress-text-breathe 1.7s ease-in-out infinite;
+}
+
+@keyframes progress-sheen {
+  from {
+    transform: translateX(0) skewX(-18deg);
+  }
+  to {
+    transform: translateX(420%) skewX(-18deg);
+  }
+}
+
+@keyframes progress-track-scan {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes progress-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.16);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(15, 118, 110, 0);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes step-beacon {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.82;
+  }
+}
+
+@keyframes progress-text-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.wave-slot {
+  margin-bottom: 12px;
+}
+
+.wave-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.waveform {
+  min-height: 84px;
+}
+
+.wave-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.download-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.error-box {
+  margin-top: 14px;
+  background: #fceaea;
+  color: #8a2525;
+  border: 1px solid #f5cfcf;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .runtime-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lock-grid,
+  .lock-card-head {
+    grid-template-columns: 1fr;
+  }
+
+  .lock-card-head {
+    display: grid;
+  }
+
+  .lock-card-head > span {
+    width: fit-content;
+  }
+}
