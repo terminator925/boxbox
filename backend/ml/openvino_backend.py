@@ -4,10 +4,14 @@ from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
-import openvino as ov
 import torch
 
 from backend.ml.model import BoxBoxWarpNet
+
+try:
+    import openvino as ov
+except ModuleNotFoundError:
+    ov = None
 
 OPENVINO_DEVICE_PRIORITY = ("NPU", "GPU", "CPU")
 
@@ -22,11 +26,15 @@ class _ExportWrapper(torch.nn.Module):
 
 
 @lru_cache(maxsize=1)
-def _core() -> ov.Core:
+def _core():
+    if ov is None:
+        raise RuntimeError("OpenVINO is not installed")
     return ov.Core()
 
 
 def available_devices() -> list[str]:
+    if ov is None:
+        return []
     return list(_core().available_devices)
 
 
@@ -70,6 +78,8 @@ def ensure_onnx_export(model_path: Path, seq_len: int, feature_dim: int) -> Path
 
 @lru_cache(maxsize=16)
 def _compiled_model(model_path_str: str, ov_device: str, seq_len: int, feature_dim: int):
+    if ov is None:
+        raise RuntimeError("OpenVINO is not installed")
     model_path = Path(model_path_str)
     onnx_path = ensure_onnx_export(model_path, seq_len=seq_len, feature_dim=feature_dim)
     compiled = _core().compile_model(str(onnx_path), ov_device)
@@ -78,6 +88,8 @@ def _compiled_model(model_path_str: str, ov_device: str, seq_len: int, feature_d
 
 
 def infer_with_openvino(model_path: Path, features: np.ndarray, mask: np.ndarray, ov_device: str | None = None) -> tuple[np.ndarray, str] | None:
+    if ov is None:
+        return None
     device = ov_device or preferred_device()
     if device is None:
         return None
