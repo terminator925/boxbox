@@ -1,6 +1,12 @@
-# BoxBox MVP
+# BoxBox
 
-BoxBox is a local-first capstone MVP for audio quantization via onset-anchored time warping, with optional ML augmentation.
+BoxBox is an audio quantization and fixed-BPM warping app for turning drifting recordings into DAW-ready material for sampling, remixing, editing, and music production.
+
+## Live Beta
+
+Test the latest public build here:
+
+[https://boxbox-vk50.onrender.com](https://boxbox-vk50.onrender.com)
 
 ## What it does
 
@@ -85,9 +91,13 @@ If you want to override the promoted runtime for debugging or oracle comparisons
 
 5. Open `http://localhost:5173` and test upload + quantize.
 
-## Free Online Demo Hosting
+## Hosted Access
 
-The simplest public demo setup for teachers or beta testers is a single Render web service.
+The public beta is available at:
+
+[https://boxbox-vk50.onrender.com](https://boxbox-vk50.onrender.com)
+
+This repo also includes the deployment setup used to publish that hosted version.
 
 This repo now includes:
 
@@ -105,9 +115,9 @@ That setup builds the React frontend, serves it from FastAPI, and exposes the wh
 5. Deploy and wait for the first build to finish.
 6. Open the public `onrender.com` URL and test upload + quantize.
 
-### Important demo note
+### Hosted beta note
 
-Free hosting is good for capstone/testing access, but not for production:
+The current hosted build runs on free infrastructure, so it is suitable for testing and evaluation but not yet tuned for production traffic:
 
 - the service may sleep when idle
 - the first request may be slow
@@ -413,14 +423,14 @@ data/examples/
 - `scripts/promote_model.ps1`: dry-run or apply promotion of the top ranked checkpoint to `boxbox_latest.pt`
 - `scripts/train_model.ps1`: train CNN+BiLSTM warp model
 
-## Limitations (MVP)
+## Current Limitations
 
 - Fallback warp path is interpolation-based time mapping (Rubber Band used if available).
 - Tempo-map MIDI is simple marker track at constant BPM.
 - ML confidence is a lightweight proxy, not calibrated uncertainty.
 - No deployment/auth/billing layer yet.
 
-## Roadmap
+## Product Roadmap
 
 - Production deploy target (container + managed object storage)
 - Improved phase-vocoder/rubberband integration controls
