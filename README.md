@@ -2,11 +2,15 @@
 
 BoxBox is an audio quantization and fixed-BPM warping app for turning drifting recordings into DAW-ready material for sampling, remixing, editing, and music production.
 
+Copyright (c) 2026 Alexander Thaddeus Stepnowsky. Released under the MIT License. See [LICENSE](LICENSE).
+
 ## Live Beta
 
 Test the latest public build here:
 
 [https://boxbox-vk50.onrender.com](https://boxbox-vk50.onrender.com)
+
+The public beta is useful for light testing, but the recommended way to evaluate or build on BoxBox is to run it locally. Local execution is more reliable for longer songs and avoids free-hosting memory limits.
 
 ## What it does
 
@@ -24,7 +28,16 @@ Test the latest public build here:
   - `tempo_map.mid` (constant BPM + beat markers)
 - Frontend includes progress tracking and A/B playback waveforms
 
-## 5-Minute Quick Start (Windows)
+## Local Run
+
+BoxBox is easiest to evaluate locally. The app uses a FastAPI backend plus a React frontend.
+
+Local addresses:
+
+- Backend: `http://127.0.0.1:8000`
+- Frontend: `http://127.0.0.1:5173`
+
+## Windows Setup
 
 1. Open PowerShell in this repo.
 2. Run:
@@ -89,7 +102,61 @@ If you want to override the promoted runtime for debugging or oracle comparisons
 .\backend\.venv\Scripts\python.exe scripts/launch_gui.py --infer-accelerator cuda --inference-candidate-strategy all --hybrid-search-strategy all
 ```
 
-5. Open `http://localhost:5173` and test upload + quantize.
+5. Open `http://127.0.0.1:5173` and test upload + quantize.
+
+## macOS Setup
+
+1. Open Terminal in this repo.
+2. Run:
+
+```bash
+./scripts/setup_macos.sh
+```
+
+3. In terminal 1, run backend:
+
+```bash
+./scripts/run_backend_macos.sh
+```
+
+4. In terminal 2, run frontend:
+
+```bash
+./scripts/run_frontend_macos.sh
+```
+
+5. Open `http://127.0.0.1:5173` and test upload + quantize.
+
+### Manual macOS setup
+
+If you prefer to install dependencies yourself instead of using the helper scripts:
+
+```bash
+brew install ffmpeg rubberband node python@3.11
+python3.11 -m venv backend/.venv
+source backend/.venv/bin/activate
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r backend/requirements.txt
+deactivate
+cd frontend && npm install
+```
+
+Then launch the backend:
+
+```bash
+cd /path/to/boxbox
+export BOXBOX_INFER_ACCELERATOR=torch
+export BOXBOX_INFER_CANDIDATE_STRATEGY=core4_adaptive_plus
+export BOXBOX_HYBRID_SEARCH_STRATEGY=core4
+./backend/.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+```
+
+And the frontend:
+
+```bash
+cd /path/to/boxbox/frontend
+npm run dev -- --host 127.0.0.1 --port 5173
+```
 
 ## Hosted Access
 
@@ -101,8 +168,8 @@ This repo also includes the deployment setup used to publish that hosted version
 
 This repo now includes:
 
-- [Dockerfile](/H:/BoxBox/Dockerfile)
-- [render.yaml](/H:/BoxBox/render.yaml)
+- [Dockerfile](Dockerfile)
+- [render.yaml](render.yaml)
 
 That setup builds the React frontend, serves it from FastAPI, and exposes the whole app from one public URL.
 
@@ -111,7 +178,7 @@ That setup builds the React frontend, serves it from FastAPI, and exposes the wh
 1. Push this repo to GitHub.
 2. Create a free Render account and connect the GitHub repo.
 3. Choose `Blueprint` or `Web Service`.
-4. If using the blueprint, Render will detect [render.yaml](/H:/BoxBox/render.yaml).
+4. If using the blueprint, Render will detect [render.yaml](render.yaml).
 5. Deploy and wait for the first build to finish.
 6. Open the public `onrender.com` URL and test upload + quantize.
 
@@ -122,6 +189,7 @@ The current hosted build runs on free infrastructure, so it is suitable for test
 - the service may sleep when idle
 - the first request may be slow
 - long audio jobs can still be limited by free CPU time
+- larger uploads or heavier quantization runs may be more reliable locally
 
 ## Optional CLI smoke test
 
@@ -411,6 +479,9 @@ data/examples/
 - `scripts/setup_windows.ps1`: install backend/frontend deps, validate ffmpeg
 - `scripts/run_backend.ps1`: start FastAPI server on `localhost:8000`
 - `scripts/run_frontend.ps1`: start Vite app on `localhost:5173`
+- `scripts/setup_macos.sh`: install macOS dependencies and create the local environment
+- `scripts/run_backend_macos.sh`: start FastAPI server on `127.0.0.1:8000` on macOS
+- `scripts/run_frontend_macos.sh`: start Vite app on `127.0.0.1:5173` on macOS
 - `scripts/smoke_test.ps1`: API happy-path smoke test + stereo check
 - `scripts/run_stayin_alive_canary.ps1`: run the Stayin' Alive 104 BPM 100% DAW-lock canary + gate
 - `scripts/run_metronome_canary_suite.ps1`: run the full DAW-lock canary/gate over a capped manifest slice
@@ -429,6 +500,12 @@ data/examples/
 - Tempo-map MIDI is simple marker track at constant BPM.
 - ML confidence is a lightweight proxy, not calibrated uncertainty.
 - No deployment/auth/billing layer yet.
+
+## Authorship
+
+Creator and copyright holder:
+
+- Alexander Thaddeus Stepnowsky
 
 ## Product Roadmap
 
