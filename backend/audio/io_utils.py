@@ -97,15 +97,6 @@ def convert_to_wav(src_path: Path, dst_path: Path, target_sr: int | None = None)
     dst_path.parent.mkdir(parents=True, exist_ok=True)
     target_sr = int(target_sr or metadata["sample_rate"] or 44100)
 
-    try:
-        audio, src_sr = sf.read(str(src_path), always_2d=True)
-        audio = _resample_if_needed(audio, int(src_sr), target_sr)
-        sf.write(str(dst_path), audio, target_sr, subtype="FLOAT")
-        metadata["processing_sample_rate"] = target_sr
-        return metadata
-    except Exception:
-        pass
-
     cmd = [
         "ffmpeg",
         "-y",
@@ -124,12 +115,19 @@ def convert_to_wav(src_path: Path, dst_path: Path, target_sr: int | None = None)
         str(dst_path),
     ]
     result = _run_subprocess(cmd)
-    if result.returncode != 0 or not dst_path.exists() or dst_path.stat().st_size == 0:
+    if result.returncode == 0 and dst_path.exists() and dst_path.stat().st_size > 0:
+        metadata["processing_sample_rate"] = target_sr
+        return metadata
+
+    try:
+        audio, src_sr = sf.read(str(src_path), always_2d=True)
+        audio = _resample_if_needed(audio, int(src_sr), target_sr)
+        sf.write(str(dst_path), audio, target_sr, subtype="FLOAT")
+        metadata["processing_sample_rate"] = target_sr
+        return metadata
+    except Exception:
         err = (result.stderr or "").strip() or "unknown ffmpeg error"
         raise RuntimeError(f"Audio conversion failed: {err}")
-
-    metadata["processing_sample_rate"] = target_sr
-    return metadata
 
 
 def load_audio(path: Path) -> tuple[np.ndarray, int]:
@@ -240,6 +238,32 @@ def audio_info(audio: np.ndarray, sr: int, source_meta: dict | None = None) -> d
                 "source_bit_rate": int(source_meta.get("bit_rate") or 0),
                 "source_bits_per_sample": int(source_meta.get("bits_per_sample") or 0),
                 "is_lossless_source": bool(source_meta.get("is_lossless_source", False)),
+            }
+        )
+    return info
+
+
+def audio_info_from_meta(source_meta: dict | None = None) -> dict:
+    meta = dict(source_meta or {})
+    sr = int(meta.get("sample_rate") or meta.get("processing_sample_rate") or 0)
+    channels = max(1, int(meta.get("channels") or 1))
+    info = {
+        "duration_sec": float(meta.get("duration_sec") or 0.0),
+        "sr": sr,
+        "channels": channels,
+        "is_stereo": channels == 2,
+    }
+    if meta:
+        info.update(
+            {
+                "original_filename": meta.get("original_filename", ""),
+                "source_extension": meta.get("container_extension", ""),
+                "source_codec": meta.get("codec_name", ""),
+                "source_format_name": meta.get("format_name", ""),
+                "source_sample_rate": int(meta.get("sample_rate") or sr),
+                "source_bit_rate": int(meta.get("bit_rate") or 0),
+                "source_bits_per_sample": int(meta.get("bits_per_sample") or 0),
+                "is_lossless_source": bool(meta.get("is_lossless_source", False)),
             }
         )
     return info

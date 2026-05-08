@@ -29,3 +29,26 @@ def test_load_audio_falls_back_to_ffmpeg_when_soundfile_fails(tmp_path: Path, mo
     assert sr == 48000
     assert audio.shape == (2, 2)
     np.testing.assert_allclose(audio, samples)
+
+
+def test_audio_info_from_meta_builds_upload_response():
+    info = io_utils.audio_info_from_meta(
+        {
+            "duration_sec": 12.5,
+            "sample_rate": 44100,
+            "channels": 2,
+            "original_filename": "song.mp3",
+            "container_extension": ".mp3",
+            "codec_name": "mp3",
+            "format_name": "mp3",
+            "bit_rate": 320000,
+            "bits_per_sample": 0,
+            "is_lossless_source": False,
+        }
+    )
+
+    assert info["duration_sec"] == 12.5
+    assert info["sr"] == 44100
+    assert info["channels"] == 2
+    assert info["is_stereo"] is True
+    assert info["source_extension"] == ".mp3"

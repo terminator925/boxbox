@@ -39,7 +39,7 @@ from backend.audio.feedback import (
     update_feedback_memory,
 )
 from backend.audio.features import compute_mel_feature, extract_features
-from backend.audio.io_utils import audio_info, convert_to_wav, load_audio, mixdown_mono
+from backend.audio.io_utils import audio_info, audio_info_from_meta, convert_to_wav, load_audio, mixdown_mono
 from backend.audio.metadata import metadata_bpm_from_tags
 from backend.audio.onsets import detect_onsets, detect_onsets_from_envelope
 from backend.audio.segmentation import find_segments
@@ -4794,18 +4794,12 @@ async def upload_audio(file: UploadFile = File(...)):
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Unsupported or unreadable audio file: {exc}") from exc
 
-    audio, sr = load_audio(input_wav)
-    info = audio_info(audio, sr, source_meta=source_meta)
+    info = audio_info_from_meta(source_meta)
     metadata_bpm = _metadata_bpm_from_source_meta(source_meta)
     if metadata_bpm is not None:
         info["estimated_bpm"] = _normalize_target_bpm(metadata_bpm)
         info["estimated_bpm_raw"] = float(metadata_bpm)
         info["estimated_bpm_source"] = "metadata"
-    else:
-        audio_bpm = estimate_tempo(mixdown_mono(audio), sr)
-        info["estimated_bpm"] = _normalize_target_bpm(audio_bpm)
-        info["estimated_bpm_raw"] = float(audio_bpm)
-        info["estimated_bpm_source"] = "audio"
     info["source_meta"] = source_meta
 
     _update_job(job_id, "uploaded", "uploaded", 0.0, "Upload complete", info)
