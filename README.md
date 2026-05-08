@@ -80,7 +80,9 @@ The setup scripts install or verify these for you.
   - `tempo_map.mid` (constant BPM + beat markers)
 - Frontend includes progress tracking and A/B playback waveforms
 
-## Windows Setup
+Most users only need the quick start above. Everything below is optional deeper setup, verification, training, and development material.
+
+## Detailed Windows Setup
 
 1. Open PowerShell in this repo.
 2. Run:
@@ -147,7 +149,7 @@ If you want to override the promoted runtime for debugging or oracle comparisons
 
 5. Open `http://127.0.0.1:5173` and test upload + quantize.
 
-## macOS Setup
+## Detailed macOS Setup
 
 1. Open Terminal in this repo.
 2. Run:
@@ -201,7 +203,7 @@ cd /path/to/boxbox/frontend
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-## Optional CLI smoke test
+## Quick Verification
 
 With backend running:
 
@@ -211,44 +213,9 @@ scripts/smoke_test.ps1 -AudioPath "C:\path\to\your\file.wav"
 
 This uploads, quantizes with source-tempo defaults, downloads outputs, and verifies stereo preservation.
 
-## Stayin' Alive 100% DAW-Lock Canary
+## Advanced Training And Evaluation
 
-Run the core mission canary and fail if the fixed-tempo DAW-lock contract regresses:
-
-```powershell
-scripts/run_stayin_alive_canary.ps1
-```
-
-The gate requires `daw_locked`, segment locked ratio `1.0`, effective fixed-window locked ratio at threshold, zero unstable/meltdown segments or windows, no warp-continuity `jump_risk`, clean `daw_lock_diagnostics`, a generated `metronome_check.wav` at the target BPM, average post-quantize timing error at or below `35ms`, and elapsed processing time at or below `130s` by default. Reports also include the raw fixed-window ratio, any excluded sparse-tail windows, and diagnostic summaries so outro leniency and warp-jump risks stay visible.
-
-The runner prints a compact gate summary after each pass, including fixed-window lock, raw fixed-window lock, average timing error, elapsed time, continuity, max warp jump, diagnostics, and metronome-check BPM. On failure it lists the failed check names before dumping observed metrics.
-The gate also verifies and prints the runtime config, so a pass must come from the expected promoted product path rather than an accidental stale/oracle setup.
-Every canary run also refreshes `outputs/canary_history_summary_latest.json` by default.
-
-Summarize recent canary gate history without opening every JSON file:
-
-```powershell
-scripts/summarize_canary_history.ps1 -Output outputs/canary_history_summary_latest.json
-```
-
-This scans canary JSONs, skips non-gate reports, and prints latest pass/fail, lock ratios, error, elapsed time, and latest-vs-previous trend.
-
-Run the same full upload/quantize/gate canary over a small manifest slice. This is intentionally long-running, so start with a small `-MaxCanaryFiles` value:
-
-```powershell
-scripts/run_metronome_canary_suite.ps1 -AudioManifest data/benchmark_corpus_stash_smoke.json -MaxCanaryFiles 3 -SkipAudioErrors
-```
-
-The suite writes `outputs/metronome_canary_suite_latest.partial.json` as it goes. If a long run is interrupted, rerun with `-Resume` to reuse completed tracks.
-Successful suite runs also write `outputs/metronome_canary_suite_summary_latest.json`, ranking hardest failures, slowest tracks, best locks, and failed-check counts.
-
-Summarize an existing suite report manually:
-
-```powershell
-scripts/summarize_metronome_canary_suite.ps1 -Report outputs/metronome_canary_suite_latest.json
-```
-
-## Train ML model (optional)
+### Train ML model (optional)
 
 Preview the training split, validation split, dataset-family mix, and generated-vs-real source mix before spending time on a run:
 
@@ -484,25 +451,44 @@ data/examples/
     warped.wav
 ```
 
-## Scripts Summary
+## Key Scripts
 
-- `scripts/setup_windows.ps1`: install backend/frontend deps, validate ffmpeg
-- `scripts/run_backend.ps1`: start FastAPI server on `localhost:8000`
-- `scripts/run_frontend.ps1`: start Vite app on `localhost:5173`
-- `scripts/setup_macos.sh`: install macOS dependencies and create the local environment
-- `scripts/run_backend_macos.sh`: start FastAPI server on `127.0.0.1:8000` on macOS
-- `scripts/run_frontend_macos.sh`: start Vite app on `127.0.0.1:5173` on macOS
-- `scripts/smoke_test.ps1`: API happy-path smoke test + stereo check
-- `scripts/run_stayin_alive_canary.ps1`: run the Stayin' Alive 104 BPM 100% DAW-lock canary + gate
-- `scripts/run_metronome_canary_suite.ps1`: run the full DAW-lock canary/gate over a capped manifest slice
-- `scripts/summarize_metronome_canary_suite.ps1`: summarize hardest failures and slowest tracks from a metronome canary suite
-- `scripts/generate_synthetic_examples.ps1`: create synthetic paired training examples
-- `scripts/import_public_examples.ps1`: convert downloaded public MIDI datasets into paired audio examples
-- `scripts/dataset_inventory.ps1`: inspect dataset family counts and generated-vs-real percentages
-- `scripts/model_leaderboard.ps1`: rank model manifests by validation score for candidate selection
-- `scripts/compare_models.ps1`: compare a manifest-backed candidate against the active model before promotion
-- `scripts/promote_model.ps1`: dry-run or apply promotion of the top ranked checkpoint to `boxbox_latest.pt`
-- `scripts/train_model.ps1`: train CNN+BiLSTM warp model
+- `scripts/setup_windows.ps1`: install backend and frontend dependencies on Windows
+- `scripts/setup_macos.sh`: install backend and frontend dependencies on macOS
+- `scripts/run_backend.ps1`: start the backend on Windows
+- `scripts/run_frontend.ps1`: start the frontend on Windows
+- `scripts/run_backend_macos.sh`: start the backend on macOS
+- `scripts/run_frontend_macos.sh`: start the frontend on macOS
+- `scripts/smoke_test.ps1`: run a quick end-to-end API smoke test
+- `scripts/train_model.ps1`: train or dry-run the ML model pipeline
+
+## Advanced Validation
+
+These workflows are mainly for deeper regression testing, benchmark runs, and model validation.
+
+Run the main fixed-tempo DAW-lock canary:
+
+```powershell
+scripts/run_stayin_alive_canary.ps1
+```
+
+Summarize recent canary history:
+
+```powershell
+scripts/summarize_canary_history.ps1 -Output outputs/canary_history_summary_latest.json
+```
+
+Run a broader manifest-based canary suite:
+
+```powershell
+scripts/run_metronome_canary_suite.ps1 -AudioManifest data/benchmark_corpus_stash_smoke.json -MaxCanaryFiles 3 -SkipAudioErrors
+```
+
+Summarize an existing suite report:
+
+```powershell
+scripts/summarize_metronome_canary_suite.ps1 -Report outputs/metronome_canary_suite_latest.json
+```
 
 ## Current Limitations
 
