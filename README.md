@@ -217,206 +217,74 @@ This uploads, quantizes with source-tempo defaults, downloads outputs, and verif
 
 ### Train ML model (optional)
 
-Preview the training split, validation split, dataset-family mix, and generated-vs-real source mix before spending time on a run:
+Common entry points:
 
 ```powershell
 scripts/train_model.ps1 -DryRun -Datasets "legacy_audio,groove_audio,maestro_audio" -MaxExamples 200
 ```
 
-Inspect generated-vs-real training data percentages without decoding audio:
-
-```powershell
-scripts/dataset_inventory.ps1 -Examples "data/examples;data/examples_real_audio_musicnet"
-```
-
-Inventory a private sample/song stash as a read-only full-track test source. This excludes split stems with `(drums)`, `(bass)`, `(vocals)`, or `(other)` in the filename by default:
-
-```powershell
-scripts/inventory_sample_stash.ps1 -Root "H:\SAUCE (AUDIO)\SONG STASH\songs n samples"
-```
-
-For a stricter likely-full-track benchmark manifest, exclude obvious loops and require at least 60 seconds of probed duration:
-
-```powershell
-scripts/inventory_sample_stash.ps1 -Root "H:\SAUCE (AUDIO)\SONG STASH\songs n samples" -Output data/sample_stash_full_track_candidates.json -ExcludeLikelyLoops -MinDurationSec 60
-```
-
-Build tiered benchmark corpora from that manifest:
-
-```powershell
-scripts/build_sample_corpora.ps1 -IncludeFull
-```
-
-Classify the stash into likely older/unquantized versus likely modern/grid-produced tracks using filename/path/year/metadata clues:
-
-```powershell
-scripts/classify_sample_era.ps1 -ProbeTags
-```
-
-Run an audio gridness probe over the likely older corpus to confirm which tracks actually behave like drifting/non-grid recordings:
-
-```powershell
-scripts/analyze_sample_gridness.ps1 -Manifest data/benchmark_corpus_stash_likely_older_with_tags.json -ClipDuration 45
-```
-
-For stronger evidence, sample multiple windows across each track:
-
-```powershell
-scripts/analyze_sample_gridness.ps1 -Manifest data/benchmark_corpus_stash_likely_older_with_tags.json -ClipDuration 30 -Windows 3
-```
-
-Run a quick proxy benchmark against the stash smoke corpus:
-
-```powershell
-scripts/run_benchmarks.ps1 -AudioManifest data/benchmark_corpus_stash_smoke.json -ProxyOnly -ClipDuration 30
-```
-
-For longer stash corpora, write incremental results and resume after interruption:
-
-```powershell
-scripts/run_benchmarks.ps1 -AudioManifest data/benchmark_corpus_stash_audio_drifting_older79_windows3.json -ProxyOnly -SkipValidation -ClipDuration 10 -Output outputs/drifting_proxy_report.json -IncrementalOutput outputs/drifting_proxy_report.partial.json -Resume
-```
-
-If a broad private manifest contains mislabeled or corrupt audio, add `-SkipAudioErrors` to record failed files in the report instead of stopping the whole run.
-
-Benchmark runs now default to the promoted fast path: `-InferenceAccelerator torch -InferenceCandidateStrategy core4_adaptive_plus -HybridSearchStrategy core4`.
-
-For faster dev-only model-routing experiments, add `-MaxInferenceModels 2` to evaluate only the top two candidate checkpoints. Leave this unset for quality/default validation.
-
-For oracle/full-search comparisons, override the promoted benchmark defaults explicitly:
-
-```powershell
-scripts/run_benchmarks.ps1 -AudioManifest data/benchmark_corpus_stash_smoke.json -ProxyOnly -ClipDuration 30 -InferenceCandidateStrategy all -HybridSearchStrategy all
-```
-
-Summarize a benchmark report into hardest tracks, regressions, and best improvements:
-
-```powershell
-scripts/summarize_benchmark_report.ps1 -Report outputs/benchmark_report.json -Output outputs/benchmark_summary.json
-```
-
-Summaries also surface slowest tracks and their slowest benchmark stage when reports include `processing_timing`, which helps target runtime optimization.
-
-Gate a faster benchmark mode against the full quality baseline before promoting it as a product default:
-
-```powershell
-scripts/gate_benchmark_candidate.ps1 -BaselineReport outputs/drifting20_proxy_torch5_verified_hybrid_report.json -CandidateReport outputs/drifting20_proxy_torch5_m2_report.json -Output outputs/drifting20_m2_speed_gate.json -MaxAvgRegressionSec 0.001 -MaxPerFileRegressionSec 0.003 -MinSpeedupPct 20
-```
-
-The gate compares hybrid timing error and processing speed over shared tracks, then reports whether average regression, worst per-file regression, and required speedup all pass.
-
-Run a compact readiness report across dataset inventory, manifest validation, leaderboard, comparison, and promotion dry-run:
-
-```powershell
-scripts/model_readiness.ps1 -Examples "data/examples;data/examples_real_audio_musicnet" -ModelsDir models
-```
-
-Create a guarded smoke checkpoint to test model registry/manifest plumbing without a full training run:
-
-```powershell
-scripts/create_smoke_checkpoint.ps1 -Output outputs/smoke/boxbox_smoke.pt
-scripts/model_readiness.ps1 -ModelsDir outputs/smoke -MaxExamples 10
-```
-
-Smoke checkpoints default to `status=smoke_test`, so they appear in readiness/leaderboard reports but are blocked from promotion by `status_not_trained`.
-
-Or run the whole lifecycle smoke check in one command:
-
-```powershell
-scripts/model_lifecycle_smoke.ps1
-```
-
-List trained model manifests by validation score:
-
-```powershell
-scripts/model_leaderboard.ps1 -Limit 10
-```
-
-Leaderboard rows include `warnings`; `low_val_examples` means the checkpoint is visible for inspection but does not have enough validation examples for safe promotion. Source-mix warnings such as `no_real_training_data` and `unknown_source_mix` are also shown so synthetic-only or poorly identified training runs do not look production-ready. The default evidence floor is four validation examples and at least `1%` real training data:
-
-```powershell
-scripts/model_leaderboard.ps1 -MinValExamples 8 -MinRealPct 5
-```
-
-Audit model manifests that are missing from ranking:
-
-```powershell
-scripts/model_leaderboard.ps1 -Validate
-```
-
-Restore missing sidecar manifests from checkpoints that embed `training_manifest` metadata:
-
-```powershell
-scripts/model_leaderboard.ps1 -SyncEmbedded
-scripts/model_leaderboard.ps1 -SyncEmbedded -Apply
-```
-
-Compare the top candidate against the active model manifest:
-
-```powershell
-scripts/compare_models.ps1
-```
-
-Comparison blocks candidates below the validation-evidence floor or with blocking training-data warnings:
-
-```powershell
-scripts/compare_models.ps1 -MinValExamples 8 -MinRealPct 5
-```
-
-Preview promoting the best safe manifest-backed checkpoint to the active model:
-
-```powershell
-scripts/promote_model.ps1
-```
-
-Promotion scans ranked candidates in order and skips models that fail the comparison or data-quality gates, reporting `rejected_candidate_count` in the dry-run output.
-
-Apply promotion only after reviewing the dry-run output:
-
-```powershell
-scripts/promote_model.ps1 -Apply
-```
-
-Promotion requires the manifest comparison gate to pass by default; tune the minimum score improvement if needed:
-
-```powershell
-scripts/promote_model.ps1 -MinScoreImprovementPct 2.5
-```
-
-Promotion also requires the candidate to meet the validation-evidence and real-data floors:
-
-```powershell
-scripts/promote_model.ps1 -MinValExamples 8 -MinRealPct 5
-```
-
-Train with the repo-local warp-target cache and balanced sampling:
-
 ```powershell
 scripts/train_model.ps1 -Epochs 12 -BatchSize 2 -Device cpu -WarmCache -DatasetBalance inverse
 ```
-
-To synthesize paired training data automatically first:
-
-```powershell
-scripts/generate_synthetic_examples.ps1 -Count 64 -Clean
-```
-
-Or generate and train in one step:
 
 ```powershell
 scripts/train_model.ps1 -GenerateCount 64 -CleanSyntheticData -Epochs 12 -BatchSize 2 -Device cpu
 ```
 
-Useful training controls:
+Useful support scripts:
+
+```powershell
+scripts/dataset_inventory.ps1 -Examples "data/examples;data/examples_real_audio_musicnet"
+```
+
+```powershell
+scripts/inventory_sample_stash.ps1 -Root "H:\SAUCE (AUDIO)\SONG STASH\songs n samples"
+```
+
+```powershell
+scripts/build_sample_corpora.ps1 -IncludeFull
+```
+
+```powershell
+scripts/classify_sample_era.ps1 -ProbeTags
+```
+
+```powershell
+scripts/analyze_sample_gridness.ps1 -Manifest data/benchmark_corpus_stash_likely_older_with_tags.json -ClipDuration 30 -Windows 3
+```
+
+Benchmarking and model selection:
+
+```powershell
+scripts/run_benchmarks.ps1 -AudioManifest data/benchmark_corpus_stash_smoke.json -ProxyOnly -ClipDuration 30
+```
+
+```powershell
+scripts/model_readiness.ps1 -Examples "data/examples;data/examples_real_audio_musicnet" -ModelsDir models
+```
+
+```powershell
+scripts/model_leaderboard.ps1 -Limit 10
+```
+
+```powershell
+scripts/compare_models.ps1
+```
+
+```powershell
+scripts/promote_model.ps1
+```
+
+Training notes:
 
 - `-Examples`: one examples directory, or multiple directories separated by the OS path separator (`;` on Windows)
 - `-DryRun`: print train/validation counts and dataset-family mix without loading audio or writing a model
-- `-Datasets`: comma-separated dataset families such as `legacy_audio,groove_audio,maestro_audio,synthetic`
+- `-Datasets`: comma-separated dataset families such as `legacy_audio`, `groove_audio`, `maestro_audio`, or `synthetic`
 - `-DatasetBalance inverse`: upsample underrepresented dataset families during training
 - `-WarmCache`: build/reuse disk-cached warp targets before training for more predictable epoch timing
-- `-MinImprovementPct`, `-MaxAfterSec`, `-MinEventCount`, `-MaxExamples`: filter weak or oversized examples during experiments; capped examples are selected in a deterministic family-balanced order
+- `-MaxExamples`: cap dataset size during experiments
 - `-InitModel`: continue training from an existing checkpoint
-- `-ManifestOutput`: write the training/dry-run manifest JSON to an explicit path; trained models also write `<model>.training.json` by default
+- `-ManifestOutput`: write the training or dry-run manifest JSON to an explicit path
 - `-SkipEvaluate`: train only, useful for quick smoke runs
 
 Dataset inventory groups examples as `real` when they come from real-audio families or audio source files, `generated` when they are synthetic or MIDI-import derived, and `unknown` when metadata is insufficient.
