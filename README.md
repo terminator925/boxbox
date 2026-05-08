@@ -4,13 +4,7 @@ BoxBox is an audio quantization and fixed-BPM warping app for turning drifting r
 
 Copyright (c) 2026 Alexander Thaddeus Stepnowsky. Released under the MIT License. See [LICENSE](LICENSE).
 
-## Live Beta
-
-Test the latest public build here:
-
-[https://boxbox-vk50.onrender.com](https://boxbox-vk50.onrender.com)
-
-The public beta is useful for light testing, but the recommended way to evaluate or build on BoxBox is to run it locally. Local execution is more reliable for longer songs and avoids free-hosting memory limits.
+BoxBox is intended to be run locally for reliable testing, development, and evaluation.
 
 ## What it does
 
@@ -157,39 +151,6 @@ And the frontend:
 cd /path/to/boxbox/frontend
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
-
-## Hosted Access
-
-The public beta is available at:
-
-[https://boxbox-vk50.onrender.com](https://boxbox-vk50.onrender.com)
-
-This repo also includes the deployment setup used to publish that hosted version.
-
-This repo now includes:
-
-- [Dockerfile](Dockerfile)
-- [render.yaml](render.yaml)
-
-That setup builds the React frontend, serves it from FastAPI, and exposes the whole app from one public URL.
-
-### Render deploy steps
-
-1. Push this repo to GitHub.
-2. Create a free Render account and connect the GitHub repo.
-3. Choose `Blueprint` or `Web Service`.
-4. If using the blueprint, Render will detect [render.yaml](render.yaml).
-5. Deploy and wait for the first build to finish.
-6. Open the public `onrender.com` URL and test upload + quantize.
-
-### Hosted beta note
-
-The current hosted build runs on free infrastructure, so it is suitable for testing and evaluation but not yet tuned for production traffic:
-
-- the service may sleep when idle
-- the first request may be slow
-- long audio jobs can still be limited by free CPU time
-- larger uploads or heavier quantization runs may be more reliable locally
 
 ## Optional CLI smoke test
 
