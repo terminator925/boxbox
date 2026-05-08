@@ -1,10 +1,68 @@
 # BoxBox
 
-BoxBox is an audio quantization and fixed-BPM warping app for turning drifting recordings into DAW-ready material for sampling, remixing, editing, and music production.
+BoxBox is an audio quantization app that warps drifting songs to a fixed BPM so they line up cleanly in a DAW.
 
 Copyright (c) 2026 Alexander Thaddeus Stepnowsky. Released under the MIT License. See [LICENSE](LICENSE).
 
 BoxBox is intended to be run locally for reliable testing, development, and evaluation.
+
+## Quick Start
+
+BoxBox runs as:
+
+- a Python/FastAPI backend
+- a React frontend
+
+Open the app at:
+
+- `http://127.0.0.1:5173`
+
+### Windows
+
+```powershell
+scripts/setup_windows.ps1
+```
+
+Then start the backend in one PowerShell window:
+
+```powershell
+scripts/run_backend.ps1
+```
+
+And the frontend in another:
+
+```powershell
+scripts/run_frontend.ps1
+```
+
+### macOS
+
+```bash
+./scripts/setup_macos.sh
+```
+
+Then start the backend in one Terminal window:
+
+```bash
+./scripts/run_backend_macos.sh
+```
+
+And the frontend in another:
+
+```bash
+./scripts/run_frontend_macos.sh
+```
+
+## Requirements
+
+You need:
+
+- `ffmpeg`
+- `rubberband`
+- `Python 3.11`
+- `Node.js`
+
+The setup scripts install or verify these for you.
 
 ## What it does
 
@@ -21,15 +79,6 @@ BoxBox is intended to be run locally for reliable testing, development, and eval
   - `report.json` (segments + timing metrics)
   - `tempo_map.mid` (constant BPM + beat markers)
 - Frontend includes progress tracking and A/B playback waveforms
-
-## Local Run
-
-BoxBox is easiest to evaluate locally. The app uses a FastAPI backend plus a React frontend.
-
-Local addresses:
-
-- Backend: `http://127.0.0.1:8000`
-- Frontend: `http://127.0.0.1:5173`
 
 ## Windows Setup
 
